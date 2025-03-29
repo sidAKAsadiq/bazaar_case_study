@@ -1,1 +1,1 @@
-# Bazzar Case Study
+# Bazaar Case Study
