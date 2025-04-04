@@ -23,6 +23,8 @@
     "jsonwebtoken": "^9.0.2",
     "pg": "^8.14.1",
     "pg-hstore": "^2.3.4",
+    "rate-limit-redis": "^4.2.0",
+    "redis": "^4.7.0",
     "sequelize": "^6.37.7",
     "sqlite3": "^5.1.7"
   }

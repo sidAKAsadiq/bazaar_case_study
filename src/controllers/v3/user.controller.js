@@ -1,9 +1,10 @@
 import { async_handler } from "../../utils/async_handler.js";
 import { api_error } from "../../utils/api_error.js";
-import { User } from "../../models/v2/user.models.js";
+import { User } from "../../models/v3/user.models.js";
 import { api_response } from "../../utils/api_response.js"
 import jwt from "jsonwebtoken"
-import { Op } from "sequelize";
+import { setToCache, getFromCache, invalidateCache } from "../../utils/cache.js";
+import event_bus from "../../events/event_bus.js";
 
 const generate_access_and_refresh_tokens = async(user_obj) => {
     try {
@@ -26,12 +27,10 @@ const generate_access_and_refresh_tokens = async(user_obj) => {
 const register_user = async_handler(async (req, res) => {
     const { name, email, password, role, store_id } = req.body;
   
-    // Step 1: Validate fields
     if ([name, email, password, role].some((field) => !field?.trim())) {
       throw new api_error(400, "All fields (name, email, password, role) are required.");
     }
   
-    // Step 2: Check if email already exists
     const existingUser = await User.findOne({
       where: { email }
     });
@@ -40,7 +39,6 @@ const register_user = async_handler(async (req, res) => {
       throw new api_error(409, "A user with this email already exists.");
     }
   
-    // Step 3: Create user (password gets hashed via model hook)
     const new_user = await User.create({
       name: name.trim(),
       email: email.trim().toLowerCase(),
@@ -49,7 +47,6 @@ const register_user = async_handler(async (req, res) => {
       store_id: role !== "admin" ? store_id : null
     });
   
-    // Step 4: Fetch sanitized user to return
     const created_user = await User.findByPk(new_user.id, {
       attributes: { exclude: ["password", "refresh_token"] }
     });
@@ -57,8 +54,10 @@ const register_user = async_handler(async (req, res) => {
     if (!created_user) {
       throw new api_error(500, "Something went wrong during registration.");
     }
+
+    event_bus.emit("cache:invalidate", { key: `users:all` });
+
   
-    // Step 5: Return response
     return res.status(201).json(new api_response(201, created_user, "User registered successfully!"));
   });
   
@@ -185,14 +184,20 @@ const get_current_user = async_handler(async (req, res) => {
   });
 
   const get_all_users = async_handler(async (_req, res) => {
-    const users = await User.findAll({
-      attributes: { exclude: ["password", "refresh_token"] },
-      order: [["createdAt", "DESC"]]
-    });
+    const cacheKey = "users:all";
   
-    return res
-      .status(200)
-      .json(new api_response(200, users, "All users fetched successfully."));
+    const cached = await getFromCache(cacheKey);
+    if (cached) {
+      return res.status(200).json(new api_response(200, cached, "All users (from cache)"));
+    }
+  
+    const users = await User.findAll({
+      attributes: { exclude: ["password", "refresh_token"] }
+    });
+    
+    await setToCache(cacheKey, users, 60); // 1 minute TTL
+  
+    return res.status(200).json(new api_response(200, users, "All users"));
   });
   
   const get_users_by_store = async_handler(async (req, res) => {
@@ -202,17 +207,24 @@ const get_current_user = async_handler(async (req, res) => {
       throw new api_error(400, "store_id is required.");
     }
   
+    const cacheKey = `users:store:${store_id}`;
+    const cached = await getFromCache(cacheKey);
+    if (cached) {
+      return res.status(200).json(new api_response(200, cached, "Users by store (from cache)"));
+    }
+  
     const users = await User.findAll({
       where: { store_id },
-      attributes: { exclude: ["password", "refresh_token"] },
-      order: [["createdAt", "DESC"]]
+      attributes: { exclude: ["password", "refresh_token"] }
     });
   
-    return res
-      .status(200)
-      .json(new api_response(200, users, "Users for store fetched successfully."));
+    await setToCache(cacheKey, users, 30);
+  
+    return res.status(200).json(new api_response(200, users, "Users by store"));
   });
   
+  
+
   const update_user_role = async_handler(async (req, res) => {
     const { id } = req.params;
     const { new_role } = req.body;
@@ -224,6 +236,7 @@ const get_current_user = async_handler(async (req, res) => {
   
     user.role = new_role;
     await user.save({ user_id: req.user.id }); 
+    event_bus.emit("cache:invalidate", { key: `users:all` });
 
    
     return res.status(200).json(
@@ -240,6 +253,7 @@ const get_current_user = async_handler(async (req, res) => {
     }
   
     await user.destroy({ user_id: req.user.id }); 
+    event_bus.emit("cache:invalidate", { key: `users:all` });
 
   
 
@@ -247,6 +261,7 @@ const get_current_user = async_handler(async (req, res) => {
       new api_response(200, {}, "User deleted successfully.")
     );
   });
+  
 
 
 
@@ -260,6 +275,6 @@ export {
   get_all_users,
   get_users_by_store,
   update_user_role,
-  delete_user
+  delete_user,
   
 }

@@ -5,7 +5,7 @@ import {
   get_stock_movement_summary_by_type,
   get_supplier_sourcing_summary,
   get_full_inventory_summary
-} from "../../controllers/v2/reporting.controller.js";
+} from "../../controllers/v3/reporting.controller.js";
 
 import { verify_jwt } from "../../middlewares/auth.middleware.js";
 import { authorize_roles } from "../../middlewares/authorize_roles.middleware.js";

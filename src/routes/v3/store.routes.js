@@ -5,7 +5,7 @@ import {
   get_store_by_id,
   update_store,
   delete_store
-} from "../../controllers/v2/store.controller.js";
+} from "../../controllers/v3/store.controller.js";
 
 import { verify_jwt } from "../../middlewares/auth.middleware.js";
 import {authorize_roles} from "../../middlewares/authorize_roles.middleware.js"

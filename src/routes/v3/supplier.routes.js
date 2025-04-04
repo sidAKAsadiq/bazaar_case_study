@@ -5,7 +5,7 @@ import {
   get_supplier_by_id,
   update_supplier,
   delete_supplier
-} from "../../controllers/v2/supplier.controller.js";
+} from "../../controllers/v3/supplier.controller.js";
 
 import { verify_jwt } from "../../middlewares/auth.middleware.js";
 import {authorize_roles} from "../../middlewares/authorize_roles.middleware.js"

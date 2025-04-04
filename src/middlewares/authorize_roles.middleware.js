@@ -1,7 +1,7 @@
 import { api_error } from "../utils/api_error.js";
 
 
-const authorize_user_roles = (...allowed_roles) => {
+const authorize_roles = (...allowed_roles) => {
   return (req, _res, next) => {
     const user = req.user;
 
@@ -13,4 +13,4 @@ const authorize_user_roles = (...allowed_roles) => {
   };
 };
 
-export { authorize_user_roles };
+export { authorize_roles };

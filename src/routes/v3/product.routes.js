@@ -6,7 +6,7 @@ import {
   get_product_by_id,
   update_product,
   delete_product
-} from "../../controllers/v2/product.controller.js";
+} from "../../controllers/v3/product.controller.js";
 
 import { verify_jwt } from "../../middlewares/auth.middleware.js";
 import {authorize_roles} from "../../middlewares/authorize_roles.middleware.js"

@@ -5,7 +5,7 @@ import {
   get_stock_movement_by_id,
   get_movements_by_store,
   get_movements_by_date_range
-} from "../../controllers/v2/stockmovement.controller.js";
+} from "../../controllers/v3/stockmovement.controller.js";
 
 import { verify_jwt } from "../../middlewares/auth.middleware.js";
 import {authorize_roles} from "../../middlewares/authorize_roles.middleware.js"

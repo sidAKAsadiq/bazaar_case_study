@@ -8,7 +8,7 @@ import {
   get_records_by_store,
   get_records_by_supplier,
   get_records_by_product
-} from "../../controllers/v2/store_supplier_product.controller.js";
+} from "../../controllers/v3/store_supplier_product.controller.js";
 
 import { verify_jwt } from "../../middlewares/auth.middleware.js";
 import {authorize_roles} from "../../middlewares/authorize_roles.middleware.js"
