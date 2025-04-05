@@ -342,5 +342,8 @@ In practice, V1 proved that the concept worked. However, V1 also revealed some *
 These insights set the stage for a more structured approach in V2, as we say:  
 **“Make it for single user first, then for thousands”.**
 
+
+![V1 Architecture](diagrams/v1.png)
+
  
 
