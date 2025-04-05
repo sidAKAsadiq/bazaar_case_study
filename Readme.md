@@ -318,5 +318,29 @@ Version 3 kept all V2 endpoints intact but added production-grade enhancements:
 > This version was built for concurrency, observability, and maintainability. Bazaar’s inventory operations could now scale with confidence — ensuring stock integrity and fast responses under heavy load.
 
 
+## Evolution Rationale (V1 → V3) - Summary
+
+The system’s evolution from Version 1 through Version 3 was guided by the growing demands of the business. Each version addressed the limitations of its predecessor while laying groundwork for future needs, demonstrating a commitment to incremental improvement — similar to **Bazaar’s engineering philosophy**. Below, we outline the progression through V1, V2, and V3, highlighting the rationale for each major change:
+
+### Version 1 – Monolithic Foundation
+
+The first version established the core functionality in the **simplest way possible**. It featured:
+
+- A single **Express** server
+- A few **core models** (Product, Supplier, StockMovement)
+- A **SQLite database**
+
+This was chosen for speed: it allowed us to develop and deploy rapidly, get the basic inventory features working, and start gathering feedback from real usage.
+
+In practice, V1 proved that the concept worked. However, V1 also revealed some **limitations**:
+
+- No **authentication**
+- Not ready for a **multi-user scenario**
+- Using a **file-based DB** would not hold up once data volume and concurrent usage increased
+- As more features were added, a **single-file or single-layer approach** became hard to maintain
+
+These insights set the stage for a more structured approach in V2, as we say:  
+**“Make it for single user first, then for thousands”.**
+
  
 
