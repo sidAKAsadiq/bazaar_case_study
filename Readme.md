@@ -345,5 +345,67 @@ These insights set the stage for a more structured approach in V2, as we say:
 
 ![V1 Architecture](diagrams/v1.png)
 
- 
+
+### Version 2 – Modular & Scalable Enhancement
+
+Now the codebase was split into clear layers: an **Express API layer** for routing and input validation, a **service layer** implementing business logic, and a **data layer via Sequelize models**.  
+This modularization was driven by the need for **future scalability** and team collaboration — different developers (or teams at Bazaar) could work on different modules (e.g., one focused on improving the inventory algorithms while another worked on the `auth` module) without stepping on each other’s toes.
+
+Under the hood, we **upgraded the database to PostgreSQL** to handle **high-volume transactions** and larger data sets, reflecting our assumption that many stores (each with thousands of products) would soon be using the system.
+
+We introduced the concept of **Stores** in the data model, allowing the single application to manage inventory for **multiple store locations in Bazaar’s network**.
+
+Along with multi-store support came the need for **security and role management**.  
+V2 added **JWT authentication and user roles** to ensure each store’s data is protected and only authorized personnel can perform certain actions.
+
+We also included infrastructure for **performance** (like **request throttling**) because we anticipated heavier loads (e.g., multiple POS systems hitting the APIs concurrently).
+
+The rationale was to transform the quick prototype into a robust system that could be confidently rolled out to **all of Bazaar’s partner stores**.  
+V2 is where the system started to **mirror real-world enterprise patterns** (robust database, layered design, security measures) while still being a single deployable service.  
+It struck a balance: more scalable and easier to maintain than V1, but not yet overly complex in deployment. This set the foundation for tackling even larger scale and reliability, which came with V3.
+
+![V2 Architecture](diagrams/v2.png)
+
+### Version 3 – Enterprise-Ready & Distributed
+
+The final iteration, V3, pushed the system into a truly **production-ready architecture** suitable for **Bazaar’s national scale of operations**.
+
+We evolved the design into a distributed system: the application server can now run as a cluster of processes/instances using **PM2** (could be later transformed to our choice), enabling **horizontal scaling** to serve a high volume of requests simultaneously.  
+
+This change was driven by the expectation of high traffic as more stores and perhaps other applications (like analytics or online storefronts) use the inventory service — a single instance would not suffice.
+
+We also prepared for **fault tolerance**: even if one server instance goes down, others continue serving (with a load balancer automatically routing traffic — in our case i.e. locally — PM2).  
+
+On the data side, we implemented a **primary-replica database setup**. This not only improves **read throughput** (reports and product lookups can query replicas) but also adds **resilience** (if the primary fails, a replica can take over with minimal service interruption).
+
+We augmented the **caching mechanism** to operate in a distributed context — for example, using a **centralized cache store** so that all server instances have a consistent view and limit redundant work.
+
+The introduction of an **event bus** in V3 was a forward-looking decision to integrate seamlessly with Bazaar’s broader ecosystem.  
+By **emitting events** for key actions (like stock level changes or new products), we enabled features such as **real-time inventory sync**.
+
+Throughout V3, we were guided by **Bazaar’s principles of reliability and customer focus**.
+
+The result is that V3 can:
+
+- **Gracefully handle high volumes** (large numbers of products, users, and transactions)
+- **Recover from issues** (with minimal impact on end-users)
+- **Extend to new requirements** (integration with new services or handling spikes during sales)  
+  → **without fundamental changes**
+
+![V1 Architecture](diagrams/v3.png)
+
+## Conclusion
+
+Each phase of this project’s evolution was marked by careful consideration of trade-offs and a deepening alignment with Bazaar’s mission to empower small and medium-sized retailers.  
+
+**Version 1** gave us **speed**, **Version 2** gave us **structure**, and **Version 3** gave us **scale**.  
+By incrementally incorporating **Bazaar’s engineering values** — from working closely with early users to ensure the solution actually fit their needs, to rigorously planning for scale and resilience — this inventory management system stands out as a **production-ready solution**.
+
+It not only meets the immediate requirements of tracking stock but does so in a way that can **grow and adapt within Bazaar’s ecosystem**, supporting the **company’s and country’s growth**.
+
+While working on this, I learnt things that seemed impossible to me.  
+It was truly a pleasure being part of this.
+Regards,
+Muhammad Sadiq 
+
 
