@@ -20,7 +20,7 @@ import "./events/listeners/invalidate_cache.listener.js"
 const PORT = process.env.PORT || 5050;
 
 dotenv.config({
-    path : './env'
+    path : './.env'
 })
 
 //------------Version : 1
